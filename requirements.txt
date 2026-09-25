@@ -1,0 +1,4 @@
+cadquery>=2.5
+PySide6>=6.6
+vtk>=9.3
+numpy>=1.24

@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows - unit tests and SBC_Designer.exe
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      # GitHub's Windows runners have no OpenGL 3.2 driver; Mesa's llvmpipe
+      # provides one so the VTK viewer can render in the tests.
+      - uses: ssciwr/setup-mesa-dist-win@v2
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+      - name: Unit tests
+        run: python -m pytest -v
+      - name: Build Windows application
+        run: python -m PyInstaller --noconfirm packaging/sbc_designer.spec
+      - name: Smoke test the built exe (load demo, generate a part, exit)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path dist/SBC_Designer/_internal/demo/ac_controller_pcba.step)) { throw "demo missing" }
+          $p = Start-Process -FilePath dist/SBC_Designer/SBC_Designer.exe -ArgumentList "--smoke-test" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "smoke test failed with exit code $($p.ExitCode)" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SBC_Designer-windows
+          path: dist/SBC_Designer
+
+  linux:
+    name: Linux - unit tests (Xvfb)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: System libraries for Qt/VTK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgl1 libegl1 libosmesa6 libxkbcommon-x11-0 libxcb-cursor0 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
+            libxcb-shape0 libxcb-xinerama0 libxcb-xkb1
+      - name: Install
+        run: python -m pip install -r requirements-dev.txt
+      - name: Unit tests
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+          MESA_GL_VERSION_OVERRIDE: "3.3"
+        run: xvfb-run -a -s "-screen 0 1600x1000x24" python -m pytest -v

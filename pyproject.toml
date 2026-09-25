@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sbc-designer"
+version = "0.1.0"
+description = "STEP viewer and Sandwich Circuit Board (phase 1) part generator"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["cadquery>=2.5", "PySide6>=6.6", "vtk>=9.3", "numpy>=1.24"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "pytest-qt>=4.2", "pyinstaller>=6.3"]
+
+[project.gui-scripts]
+sbc-designer = "sbc_designer.app:main"
+
+[project.scripts]
+sbc-designer-cli = "sbc_designer.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["sbc_designer*"]
