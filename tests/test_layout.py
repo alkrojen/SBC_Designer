@@ -3,15 +3,15 @@ import math
 
 import pytest
 
-from sbc_designer.design.layout import (ARM, RECESS, THROUGH, classify, compute_layout,
+from scb_designer.design.layout import (ARM, RECESS, THROUGH, classify, compute_layout,
                                         z_levels)
-from sbc_designer.design.params import SBCParameters
-from sbc_designer.geometry2d import Rect
-from sbc_designer.pcba import BOTTOM, SIDES, TOP, Feature
+from scb_designer.design.params import SCBParameters
+from scb_designer.geometry2d import Rect
+from scb_designer.pcba import BOTTOM, SIDES, TOP, Feature
 
 
 def test_z_levels():
-    z = z_levels(1.6, SBCParameters())
+    z = z_levels(1.6, SCBParameters())
     assert z.mid == pytest.approx(0.8)
     assert z.align_top == pytest.approx(3.6)
     assert z.press_top == pytest.approx(6.6)
@@ -23,7 +23,7 @@ def test_z_levels():
                                     (3.8, THROUGH), (12.0, THROUGH)])
 def test_classify(h, mode):
     f = Feature("x", 0, Rect(0, 0, 1, 1), None, h, True)
-    assert classify(f, SBCParameters()) == mode
+    assert classify(f, SCBParameters()) == mode
 
 
 def test_perimeter_screws(small_pcba):
@@ -49,9 +49,9 @@ def test_interior_screw_at_existing_hole(small_pcba):
 
 
 def test_interior_screw_modes(small_pcba):
-    none = compute_layout(small_pcba, dataclasses.replace(SBCParameters(), interior_screws="none"))
+    none = compute_layout(small_pcba, dataclasses.replace(SCBParameters(), interior_screws="none"))
     assert not any(s.interior for s in none.screws)
-    grid = compute_layout(small_pcba, dataclasses.replace(SBCParameters(), interior_screws="grid",
+    grid = compute_layout(small_pcba, dataclasses.replace(SCBParameters(), interior_screws="grid",
                                                           screw_pitch=15.0))
     interior = [s for s in grid.screws if s.interior]
     assert interior, "expected at least one grid screw on the small board"
@@ -116,5 +116,5 @@ def test_getter_volume_and_channels(small_pcba):
 
 
 def test_getter_too_big_warns(small_pcba):
-    lay = compute_layout(small_pcba, dataclasses.replace(SBCParameters(), getter_volume_ml=20.0))
+    lay = compute_layout(small_pcba, dataclasses.replace(SCBParameters(), getter_volume_ml=20.0))
     assert any("Getter volume" in w for w in lay.sides[TOP].warnings)

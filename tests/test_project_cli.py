@@ -2,11 +2,11 @@ import os
 
 import cadquery as cq
 
-from sbc_designer import cli
-from sbc_designer.demo_pcba import default_demo_path, write_demo
-from sbc_designer.design import ALIGNMENT, BOTH, SCREWS, SBCParameters
-from sbc_designer.project import Project
-from sbc_designer.step_io import ModelPart, export_step, load_step
+from scb_designer import cli
+from scb_designer.demo_pcba import default_demo_path, write_demo
+from scb_designer.design import ALIGNMENT, BOTH, SCREWS, SCBParameters
+from scb_designer.project import Project
+from scb_designer.step_io import ModelPart, export_step, load_step
 
 
 def test_project_load_generate_export(small_step, tmp_path):
@@ -40,7 +40,7 @@ def test_project_params_change_clears_generated(small_step):
     pr = Project()
     pr.load(small_step)
     pr.generate(ALIGNMENT, "top")
-    p = SBCParameters()
+    p = SCBParameters()
     p.alignment_thickness = 1.5
     pr.set_params(p)
     assert pr.generated == {}

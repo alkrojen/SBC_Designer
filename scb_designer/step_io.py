@@ -211,7 +211,7 @@ def _unique(name: str, used: set) -> str:
     return candidate
 
 
-def export_step(parts: Iterable[ModelPart], path: str, name: str = "SBC") -> str:
+def export_step(parts: Iterable[ModelPart], path: str, name: str = "SCB") -> str:
     """Write ``parts`` as one STEP assembly (names and colours kept)."""
     parts = list(parts)
     if not parts:

@@ -23,7 +23,7 @@ import numpy as np
 from ..geometry2d import (Rect, distance_to_polygon_edge, evenly_spaced,
                           minimum_spanning_tree, point_in_polygon, segment_rect)
 from ..pcba import BOTTOM, PCBA, SIDES, TOP, Feature
-from .params import SBCParameters
+from .params import SCBParameters
 
 # feature handling in the pressing layer / cover
 ARM = "arm"          # fully inside the alignment layer: sprung boss
@@ -84,7 +84,7 @@ class SideLayout:
 @dataclass
 class StackLayout:
     pcba: PCBA
-    params: SBCParameters
+    params: SCBParameters
     outer: Tuple[float, float, float, float]
     z: ZLevels
     screws: List[Screw]
@@ -103,14 +103,14 @@ class StackLayout:
 
 
 # --------------------------------------------------------------------------- #
-def z_levels(T: float, p: SBCParameters) -> ZLevels:
+def z_levels(T: float, p: SCBParameters) -> ZLevels:
     align_top = T + p.alignment_thickness
     press_top = align_top + p.pressing_thickness
     skin_top = press_top + p.cover_skin
     return ZLevels(T / 2, T, align_top, press_top, skin_top, skin_top + p.rib_height)
 
 
-def classify(f: Feature, p: SBCParameters) -> str:
+def classify(f: Feature, p: SCBParameters) -> str:
     a, t = p.alignment_thickness, p.pressing_thickness
     if f.height + p.recess_gap > a + t - p.min_roof:
         return THROUGH
@@ -123,7 +123,7 @@ def _clear_of_features(x, y, r, feats: List[Feature], keep: float) -> bool:
     return all(f.rect.distance_to_point((x, y)) >= r + keep for f in feats)
 
 
-def place_screws(pcba: PCBA, p: SBCParameters, outer) -> Tuple[List[Screw], List[str]]:
+def place_screws(pcba: PCBA, p: SCBParameters, outer) -> Tuple[List[Screw], List[str]]:
     x0, y0, x1, y1 = outer
     e = p.screw_edge_offset
     warnings: List[str] = []
@@ -173,7 +173,7 @@ class _Obstacles:
         return any(r.overlaps(o) for o in self.rects)
 
 
-def _boss_for(f: Feature, p: SBCParameters) -> Tuple[Rect, bool]:
+def _boss_for(f: Feature, p: SCBParameters) -> Tuple[Rect, bool]:
     r = f.rect
     if f.power:
         return Rect(r.cx, r.cy, 0.8 * r.length, 0.8 * r.width, r.angle), False
@@ -186,7 +186,7 @@ def _boss_for(f: Feature, p: SBCParameters) -> Tuple[Rect, bool]:
     return Rect(cx, cy, d, d, r.angle), True
 
 
-def _cantilever(boss: Rect, direction: np.ndarray, length: float, p: SBCParameters):
+def _cantilever(boss: Rect, direction: np.ndarray, length: float, p: SCBParameters):
     """Slots of a U-shaped cut that frees a tongue ending over ``boss``."""
     c = np.array(boss.center)
     perp = np.array([-direction[1], direction[0]])
@@ -205,7 +205,7 @@ def _cantilever(boss: Rect, direction: np.ndarray, length: float, p: SBCParamete
     return slots, region
 
 
-def _bridge(boss: Rect, along: np.ndarray, p: SBCParameters):
+def _bridge(boss: Rect, along: np.ndarray, p: SCBParameters):
     c = np.array(boss.center)
     perp = np.array([-along[1], along[0]])
     u = np.array(boss.axes[0])
@@ -230,7 +230,7 @@ def _inside_tiles(r: Rect, pcba: PCBA, inset: float) -> bool:
                for c in r.corners())
 
 
-def plan_arms(pcba: PCBA, p: SBCParameters, z: ZLevels, feats: List[Feature], mode, screws):
+def plan_arms(pcba: PCBA, p: SCBParameters, z: ZLevels, feats: List[Feature], mode, screws):
     obstacles = _Obstacles()
     for s in screws:
         obstacles.add(Rect(s.x, s.y, p.sleeve_od + 1.0, p.sleeve_od + 1.0))
@@ -305,13 +305,13 @@ def _split_positions(lo: float, hi: float, max_size: float,
     return out
 
 
-def _frame_band(outer, p: SBCParameters):
+def _frame_band(outer, p: SCBParameters):
     g_in = p.gasket_offset + p.gasket_width / 2 + 0.8
     g_out = p.frame_margin - p.board_edge_clearance - 0.8
     return g_in, g_out
 
 
-def place_getters(outer, p: SBCParameters, z: ZLevels, screws) -> Tuple[List[Rect], float, Tuple[float, float], List[str]]:
+def place_getters(outer, p: SCBParameters, z: ZLevels, screws) -> Tuple[List[Rect], float, Tuple[float, float], List[str]]:
     """Getter pockets and the pump port in the frame band inside the gasket."""
     x0, y0, x1, y1 = outer
     g_in, g_out = _frame_band(outer, p)
@@ -354,7 +354,7 @@ def place_getters(outer, p: SBCParameters, z: ZLevels, screws) -> Tuple[List[Rec
     return getters, vol, port, warnings
 
 
-def plan_channels(nodes: List[Tuple[float, float]], p: SBCParameters, screws) -> List[Rect]:
+def plan_channels(nodes: List[Tuple[float, float]], p: SCBParameters, screws) -> List[Rect]:
     holes = [Rect(s.x, s.y, p.sleeve_od + 1.0, p.sleeve_od + 1.0) for s in screws if s.interior]
 
     def blocked(i, j):
@@ -365,7 +365,7 @@ def plan_channels(nodes: List[Tuple[float, float]], p: SBCParameters, screws) ->
     return [segment_rect(nodes[i], nodes[j], p.channel_width) for i, j in edges]
 
 
-def plan_side(pcba: PCBA, p: SBCParameters, z: ZLevels, outer, screws, side: str) -> SideLayout:
+def plan_side(pcba: PCBA, p: SCBParameters, z: ZLevels, outer, screws, side: str) -> SideLayout:
     feats = pcba.features(side)
     keyed = [f for f in feats if f.owner]
     plain = [f for f in feats if not f.owner]
@@ -406,8 +406,8 @@ def plan_side(pcba: PCBA, p: SBCParameters, z: ZLevels, outer, screws, side: str
                       getters, gvol, port, channels, warnings)
 
 
-def compute_layout(pcba: PCBA, params: Optional[SBCParameters] = None) -> StackLayout:
-    p = params or SBCParameters()
+def compute_layout(pcba: PCBA, params: Optional[SCBParameters] = None) -> StackLayout:
+    p = params or SCBParameters()
     p.validate()
     bx0, by0, bx1, by1 = pcba.bounds
     m = p.frame_margin

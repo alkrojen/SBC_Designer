@@ -2,10 +2,10 @@
 
 Examples::
 
-    sbc-designer-cli info board.step
-    sbc-designer-cli generate board.step --part alignment --side top -o top_alignment.step
-    sbc-designer-cli generate board.step --all --out-dir parts/
-    sbc-designer-cli screenshot board.step -o view.png --with-parts
+    scb-designer-cli info board.step
+    scb-designer-cli generate board.step --part alignment --side top -o top_alignment.step
+    scb-designer-cli generate board.step --all --out-dir parts/
+    scb-designer-cli screenshot board.step -o view.png --with-parts
 """
 
 from __future__ import annotations
@@ -15,13 +15,13 @@ import os
 import sys
 from typing import List, Optional
 
-from .design import PART_TYPES, SCREWS, SBCParameters
+from .design import PART_TYPES, SCREWS, SCBParameters
 from .pcba import SIDES
 from .project import Project
 
 
 def _project(args) -> Project:
-    params = SBCParameters.load(args.params) if getattr(args, "params", None) else SBCParameters()
+    params = SCBParameters.load(args.params) if getattr(args, "params", None) else SCBParameters()
     pr = Project(params)
     pr.load(args.step)
     return pr
@@ -81,7 +81,7 @@ def cmd_screenshot(args) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(prog="sbc-designer-cli", description="SBC Designer command line")
+    ap = argparse.ArgumentParser(prog="scb-designer-cli", description="SCB Designer command line")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("info", help="analyse a PCBA STEP file")
@@ -89,7 +89,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--params", help="parameter JSON file")
     p.set_defaults(fn=cmd_info)
 
-    p = sub.add_parser("generate", help="generate SBC parts as STEP")
+    p = sub.add_parser("generate", help="generate SCB parts as STEP")
     p.add_argument("step")
     p.add_argument("--part", choices=PART_TYPES)
     p.add_argument("--side", choices=["top", "bottom", "both"], default="top")
@@ -103,7 +103,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("step")
     p.add_argument("-o", "--output", default="view.png")
     p.add_argument("--view", default="iso", choices=["iso", "top", "bottom", "front", "back", "left", "right"])
-    p.add_argument("--with-parts", action="store_true", help="generate and show all SBC parts")
+    p.add_argument("--with-parts", action="store_true", help="generate and show all SCB parts")
     p.add_argument("--explode", type=float, default=2.0)
     p.add_argument("--width", type=int, default=1600)
     p.add_argument("--height", type=int, default=1100)

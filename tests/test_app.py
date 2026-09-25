@@ -12,8 +12,8 @@ pytest.importorskip("pytestqt")
 
 from PySide6.QtCore import Qt  # noqa: E402
 
-from sbc_designer.app import MainWindow, ParametersDialog  # noqa: E402
-from sbc_designer.design import SBCParameters  # noqa: E402
+from scb_designer.app import MainWindow, ParametersDialog  # noqa: E402
+from scb_designer.design import SCBParameters  # noqa: E402
 
 
 @pytest.fixture()
@@ -59,7 +59,7 @@ def test_load_view_generate_and_export(win, qtbot, small_step, tmp_path, monkeyp
     # export the ticked parts
     node.child(0).setCheckState(0, Qt.Checked)
     out = str(tmp_path / "gui_export.step")
-    monkeypatch.setattr("sbc_designer.app.QFileDialog.getSaveFileName", lambda *a, **k: (out, ""))
+    monkeypatch.setattr("scb_designer.app.QFileDialog.getSaveFileName", lambda *a, **k: (out, ""))
     win.export_checked()
     qtbot.waitUntil(lambda: not win.busy, timeout=120000)
     assert os.path.isfile(out)
@@ -71,7 +71,7 @@ def test_load_view_generate_and_export(win, qtbot, small_step, tmp_path, monkeyp
 def test_non_pcba_file_disables_design(win, qtbot, tmp_path):
     import cadquery as cq
 
-    from sbc_designer.step_io import ModelPart, export_step
+    from scb_designer.step_io import ModelPart, export_step
 
     path = str(tmp_path / "cube.step")
     export_step([ModelPart("cube", cq.Solid.makeBox(10, 10, 10))], path)
@@ -82,10 +82,10 @@ def test_non_pcba_file_disables_design(win, qtbot, tmp_path):
 
 
 def test_parameters_dialog_roundtrip(qtbot):
-    p = SBCParameters()
+    p = SCBParameters()
     p.alignment_thickness = 1.25
     dlg = ParametersDialog(p)
     qtbot.addWidget(dlg)
     assert dlg.values().alignment_thickness == pytest.approx(1.25)
     dlg._defaults()
-    assert dlg.values() == SBCParameters()
+    assert dlg.values() == SCBParameters()

@@ -4,8 +4,8 @@ import cadquery as cq
 import numpy as np
 import pytest
 
-from sbc_designer.step_io import ModelPart
-from sbc_designer.viewer import VIEW_DIRECTIONS, Scene, explode_direction, polydata_from_mesh
+from scb_designer.step_io import ModelPart
+from scb_designer.viewer import VIEW_DIRECTIONS, Scene, explode_direction, polydata_from_mesh
 
 
 @pytest.fixture()

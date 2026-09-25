@@ -21,7 +21,7 @@ def _p(default, label, unit="mm", lo=None, hi=None, group="General", help=""):
 
 
 @dataclass
-class SBCParameters:
+class SCBParameters:
     # ---- alignment layer -------------------------------------------------
     alignment_thickness: float = _p(2.0, "Alignment layer thickness", lo=0.75, hi=2.7, group="Alignment layer")
     pocket_clearance: float = _p(0.15, "Pocket clearance", lo=0.0, hi=2.0, group="Alignment layer")
@@ -102,7 +102,7 @@ class SBCParameters:
         return dataclasses.asdict(self)
 
     @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "SBCParameters":
+    def from_dict(cls, d: Dict[str, Any]) -> "SCBParameters":
         names = {f.name: f for f in dataclasses.fields(cls)}
         kw = {}
         for k, v in d.items():
@@ -115,6 +115,6 @@ class SBCParameters:
             json.dump(self.to_dict(), fh, indent=2)
 
     @classmethod
-    def load(cls, path: str) -> "SBCParameters":
+    def load(cls, path: str) -> "SCBParameters":
         with open(path, encoding="utf-8") as fh:
             return cls.from_dict(json.load(fh))

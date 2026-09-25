@@ -68,7 +68,7 @@ def part_polydata(part: ModelPart, tolerance: Optional[float] = None) -> vtk.vtk
 
 
 def explode_direction(part: ModelPart) -> Tuple[float, float, float]:
-    """Exploded-view direction of a generated SBC part (from its metadata)."""
+    """Exploded-view direction of a generated SCB part (from its metadata)."""
     side, layer = part.meta.get("side"), part.meta.get("layer", 0)
     if side not in ("top", "bottom"):
         return (0.0, 0.0, 0.0)

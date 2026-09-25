@@ -1,10 +1,10 @@
 import cadquery as cq
 import pytest
 
-from sbc_designer.design import (ALIGNMENT, BOTH, COVER, PART_TYPES, PRESSING, SCREWS,
-                                 SBCDesigner)
-from sbc_designer.design.layout import THROUGH
-from sbc_designer.pcba import BOTTOM, SIDES, TOP
+from scb_designer.design import (ALIGNMENT, BOTH, COVER, PART_TYPES, PRESSING, SCREWS,
+                                 SCBDesigner)
+from scb_designer.design.layout import THROUGH
+from scb_designer.pcba import BOTTOM, SIDES, TOP
 
 
 def inside(shape, x, y, z):
@@ -151,7 +151,7 @@ def test_screw_grid(small_generated, small_designer):
 
 
 def test_each_part_can_be_generated_individually(small_pcba):
-    d = SBCDesigner(small_pcba)
+    d = SCBDesigner(small_pcba)
     for part in PART_TYPES:
         for side in SIDES:
             out = d.generate(part, side)
@@ -160,10 +160,10 @@ def test_each_part_can_be_generated_individually(small_pcba):
 
 def test_demo_board_all_parts(demo_pcba_model, tmp_path):
     """Full demo run: every part on both sides, exported to STEP."""
-    d = SBCDesigner(demo_pcba_model)
+    d = SCBDesigner(demo_pcba_model)
     res = d.generate_all()
     parts = [p for v in res.values() for p in v]
     assert all(p.shape.isValid() for p in parts)
     assert len(res[(PRESSING, TOP)]) >= 4
-    path = d.export(parts, str(tmp_path / "demo_sbc.step"))
-    assert (tmp_path / "demo_sbc.step").stat().st_size > 100000
+    path = d.export(parts, str(tmp_path / "demo_scb.step"))
+    assert (tmp_path / "demo_scb.step").stat().st_size > 100000

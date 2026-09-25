@@ -6,7 +6,7 @@ from __future__ import annotations
 import os
 from typing import Dict, List, Optional, Tuple
 
-from .design import BOTH, PART_TYPES, SCREWS, SBCDesigner, SBCParameters
+from .design import BOTH, PART_TYPES, SCREWS, SCBDesigner, SCBParameters
 from .pcba import PCBA, SIDES, PCBAError, analyze
 from .step_io import ModelPart, export_step, load_step
 
@@ -14,14 +14,14 @@ Key = Tuple[str, str]  # (part type, side)
 
 
 class Project:
-    def __init__(self, params: Optional[SBCParameters] = None):
-        self.params = params or SBCParameters()
+    def __init__(self, params: Optional[SCBParameters] = None):
+        self.params = params or SCBParameters()
         self.path: Optional[str] = None
         self.raw_parts: List[ModelPart] = []
         self.pcba: Optional[PCBA] = None
         self.pcba_error: Optional[str] = None
         self.generated: Dict[Key, List[ModelPart]] = {}
-        self._designer: Optional[SBCDesigner] = None
+        self._designer: Optional[SCBDesigner] = None
 
     # ------------------------------------------------------------------ #
     def load(self, path: str) -> None:
@@ -50,7 +50,7 @@ class Project:
     def can_design(self) -> bool:
         return self.pcba is not None
 
-    def set_params(self, params: SBCParameters) -> None:
+    def set_params(self, params: SCBParameters) -> None:
         params.validate()
         rebuild = self.pcba is not None and params.power_keyword_list != self.params.power_keyword_list
         self.params = params
@@ -60,11 +60,11 @@ class Project:
             self.pcba = analyze(self.raw_parts, params.power_keyword_list)
 
     @property
-    def designer(self) -> SBCDesigner:
+    def designer(self) -> SCBDesigner:
         if self.pcba is None:
             raise PCBAError(self.pcba_error or "No PCBA loaded")
         if self._designer is None:
-            self._designer = SBCDesigner(self.pcba, self.params)
+            self._designer = SCBDesigner(self.pcba, self.params)
         return self._designer
 
     # ------------------------------------------------------------------ #
@@ -91,12 +91,12 @@ class Project:
         parts = [p for k in keys for p in self.generated.get(k, [])]
         if not parts:
             raise ValueError("No generated parts to export")
-        return export_step(parts, path, name="SBC")
+        return export_step(parts, path, name="SCB")
 
     def export_each(self, folder: str) -> List[str]:
         """One STEP file per generated (part, side)."""
         os.makedirs(folder, exist_ok=True)
-        base = os.path.splitext(self.name)[0] or "sbc"
+        base = os.path.splitext(self.name)[0] or "scb"
         out = []
         for (part, side), parts in self.generated.items():
             path = os.path.join(folder, f"{base}_{side}_{part}.step")

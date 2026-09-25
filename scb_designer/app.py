@@ -1,4 +1,4 @@
-"""SBC Designer main window (PySide6 + VTK)."""
+"""SCB Designer main window (PySide6 + VTK)."""
 
 from __future__ import annotations
 
@@ -19,13 +19,13 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog, QDia
 
 from . import __version__
 from .demo_pcba import default_demo_path
-from .design import BOTH, PART_LABELS, PART_TYPES, SCREWS, SIDE_LABELS, SBCParameters
+from .design import BOTH, PART_LABELS, PART_TYPES, SCREWS, SIDE_LABELS, SCBParameters
 from .pcba import SIDES
 from .project import Project
 from .step_io import ModelPart
 from .viewer import ViewerWidget, explode_direction, part_polydata
 
-APP_NAME = "SBC Designer"
+APP_NAME = "SCB Designer"
 KEY_ROLE = Qt.UserRole + 1
 
 
@@ -52,11 +52,11 @@ def _tessellate(parts: List[ModelPart]):
 
 # --------------------------------------------------------------------------- #
 class ParametersDialog(QDialog):
-    """Form generated from the SBCParameters dataclass metadata."""
+    """Form generated from the SCBParameters dataclass metadata."""
 
-    def __init__(self, params: SBCParameters, parent=None):
+    def __init__(self, params: SCBParameters, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("SBC design parameters")
+        self.setWindowTitle("SCB design parameters")
         self._widgets: Dict[str, QWidget] = {}
         tabs = QTabWidget()
         groups: Dict[str, QFormLayout] = {}
@@ -99,9 +99,9 @@ class ParametersDialog(QDialog):
         lay.addWidget(tabs)
         lay.addWidget(buttons)
         self.resize(520, 480)
-        self.result_params: Optional[SBCParameters] = None
+        self.result_params: Optional[SCBParameters] = None
 
-    def _set(self, params: SBCParameters):
+    def _set(self, params: SCBParameters):
         for name, w in self._widgets.items():
             v = getattr(params, name)
             if isinstance(w, QComboBox):
@@ -112,9 +112,9 @@ class ParametersDialog(QDialog):
                 w.setValue(v)
 
     def _defaults(self):
-        self._set(SBCParameters())
+        self._set(SCBParameters())
 
-    def values(self) -> SBCParameters:
+    def values(self) -> SCBParameters:
         d = {}
         for name, w in self._widgets.items():
             if isinstance(w, QComboBox):
@@ -123,7 +123,7 @@ class ParametersDialog(QDialog):
                 d[name] = w.text()
             else:
                 d[name] = w.value()
-        return SBCParameters.from_dict(d)
+        return SCBParameters.from_dict(d)
 
     def _accept(self):
         try:
@@ -237,7 +237,7 @@ class MainWindow(QMainWindow):
         self.tree.setHeaderLabels(["Model"])
         self.tree.itemChanged.connect(self._item_changed)
         self.tree_root_model = QTreeWidgetItem(["PCBA"])
-        self.tree_root_gen = QTreeWidgetItem(["Generated SBC parts"])
+        self.tree_root_gen = QTreeWidgetItem(["Generated SCB parts"])
         for root in (self.tree_root_model, self.tree_root_gen):
             root.setFlags(root.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsAutoTristate)
             root.setCheckState(0, Qt.Checked)
@@ -251,7 +251,7 @@ class MainWindow(QMainWindow):
         w = QWidget()
         lay = QVBoxLayout(w)
 
-        box = QGroupBox("Generate SBC phase-1 parts")
+        box = QGroupBox("Generate SCB phase-1 parts")
         bl = QVBoxLayout(box)
         row = QHBoxLayout()
         row.addWidget(QLabel("PCB side:"))
@@ -305,7 +305,7 @@ class MainWindow(QMainWindow):
         self.report.setReadOnly(True)
         lay.addWidget(self.report, 1)
 
-        dock = QDockWidget("SBC Designer", self)
+        dock = QDockWidget("SCB Designer", self)
         dock.setObjectName("designDock")
         dock.setWidget(w)
         self.addDockWidget(Qt.RightDockWidgetArea, dock)
@@ -381,7 +381,7 @@ class MainWindow(QMainWindow):
 
     # ---------------------------------------------------------------- loading
     def open_dialog(self):
-        settings = QSettings("SBC", APP_NAME)
+        settings = QSettings("SCB", APP_NAME)
         start = settings.value("lastDir", os.path.expanduser("~"))
         path, _ = QFileDialog.getOpenFileName(self, "Open STEP file", start,
                                               "STEP files (*.step *.stp *.STEP *.STP);;All files (*)")
@@ -422,7 +422,7 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage(f"Loaded {path}")
             else:
                 self.report.setPlainText(
-                    f"{project.pcba_error}\n\nThe model can be viewed, but SBC parts can only be "
+                    f"{project.pcba_error}\n\nThe model can be viewed, but SCB parts can only be "
                     "generated for a PCBA (a thin board with components).")
                 self.statusBar().showMessage(f"Loaded {path} (not recognised as a PCBA)")
             self._update_enabled()
@@ -532,7 +532,7 @@ class MainWindow(QMainWindow):
         if dlg.exec() and dlg.result_params is not None:
             self._apply_params(dlg.result_params)
 
-    def _apply_params(self, params: SBCParameters):
+    def _apply_params(self, params: SCBParameters):
         try:
             self.project.set_params(params)
         except ValueError as exc:
@@ -547,12 +547,12 @@ class MainWindow(QMainWindow):
         path, _ = QFileDialog.getOpenFileName(self, "Load parameters", "", "JSON (*.json)")
         if path:
             try:
-                self._apply_params(SBCParameters.load(path))
+                self._apply_params(SCBParameters.load(path))
             except Exception as exc:
                 QMessageBox.warning(self, APP_NAME, f"Could not load parameters: {exc}")
 
     def save_params(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Save parameters", "sbc_parameters.json", "JSON (*.json)")
+        path, _ = QFileDialog.getSaveFileName(self, "Save parameters", "scb_parameters.json", "JSON (*.json)")
         if path:
             self.project.params.save(path)
 
@@ -571,8 +571,8 @@ class MainWindow(QMainWindow):
         if not keys:
             QMessageBox.information(self, APP_NAME, "Tick the generated parts to export first.")
             return
-        base = os.path.splitext(self.project.name)[0] or "sbc"
-        path, _ = QFileDialog.getSaveFileName(self, "Export STEP", f"{base}_sbc_parts.step",
+        base = os.path.splitext(self.project.name)[0] or "scb"
+        path, _ = QFileDialog.getSaveFileName(self, "Export STEP", f"{base}_scb_parts.step",
                                               "STEP files (*.step *.stp)")
         if path:
             self._run("Exporting ...", lambda: self.project.export(keys, path),
@@ -585,7 +585,7 @@ class MainWindow(QMainWindow):
                       lambda files: self.statusBar().showMessage(f"Exported {len(files)} STEP files to {folder}"))
 
     def save_screenshot(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Save screenshot", "sbc_view.png", "PNG (*.png)")
+        path, _ = QFileDialog.getSaveFileName(self, "Save screenshot", "scb_view.png", "PNG (*.png)")
         if path:
             self.scene.screenshot(path)
             self.statusBar().showMessage(f"Saved {path}")

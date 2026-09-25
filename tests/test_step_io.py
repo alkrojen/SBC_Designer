@@ -3,7 +3,7 @@ import os
 import cadquery as cq
 import pytest
 
-from sbc_designer.step_io import ModelPart, StepReadError, export_step, load_step
+from scb_designer.step_io import ModelPart, StepReadError, export_step, load_step
 
 
 def test_roundtrip_keeps_names_colors_and_geometry(tmp_path):

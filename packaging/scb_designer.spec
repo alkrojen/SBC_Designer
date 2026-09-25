@@ -1,5 +1,5 @@
-# PyInstaller spec for the stand-alone SBC Designer application.
-# Build from the repository root:  pyinstaller --noconfirm packaging/sbc_designer.spec
+# PyInstaller spec for the stand-alone SCB Designer application.
+# Build from the repository root:  pyinstaller --noconfirm packaging/scb_designer.spec
 import os
 
 from PyInstaller.utils.hooks import collect_all
@@ -34,8 +34,8 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="SBC_Designer",
+    name="SCB_Designer",
     console=False,
     icon=None,
 )
-coll = COLLECT(exe, a.binaries, a.datas, name="SBC_Designer")
+coll = COLLECT(exe, a.binaries, a.datas, name="SCB_Designer")

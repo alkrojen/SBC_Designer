@@ -1,4 +1,4 @@
-"""``python -m sbc_designer`` starts the GUI; ``python -m sbc_designer cli ...`` the CLI."""
+"""``python -m scb_designer`` starts the GUI; ``python -m scb_designer cli ...`` the CLI."""
 
 import sys
 

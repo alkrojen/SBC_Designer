@@ -2,8 +2,8 @@ import cadquery as cq
 import numpy as np
 import pytest
 
-from sbc_designer.pcba import BOTTOM, TOP, PCBAError, analyze, cluster_points, find_board
-from sbc_designer.step_io import ModelPart
+from scb_designer.pcba import BOTTOM, TOP, PCBAError, analyze, cluster_points, find_board
+from scb_designer.step_io import ModelPart
 
 
 def _comp(pcba, prefix):

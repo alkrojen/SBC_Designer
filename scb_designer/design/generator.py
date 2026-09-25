@@ -1,4 +1,4 @@
-"""Generation of the individual SBC phase-1 parts.
+"""Generation of the individual SCB phase-1 parts.
 
 Parts per side (top / bottom of the PCB):
 
@@ -31,7 +31,7 @@ from ..geometry2d import Rect
 from ..pcba import BOTTOM, PCBA, SIDES, TOP
 from ..step_io import ModelPart, export_step
 from .layout import RECESS, THROUGH, StackLayout, compute_layout
-from .params import SBCParameters
+from .params import SCBParameters
 from . import solids as S
 
 ALIGNMENT = "alignment"
@@ -61,12 +61,12 @@ LAYER_INDEX = {ALIGNMENT: 1, PRESSING: 2, COVER: 3, SCREWS: 4}
 MIN_PIECE_VOLUME = 0.5  # mm^3; smaller slivers are dropped
 
 
-class SBCDesigner:
-    """Generates SBC parts for one PCBA with one parameter set."""
+class SCBDesigner:
+    """Generates SCB parts for one PCBA with one parameter set."""
 
-    def __init__(self, pcba: PCBA, params: Optional[SBCParameters] = None):
+    def __init__(self, pcba: PCBA, params: Optional[SCBParameters] = None):
         self.pcba = pcba
-        self.params = params or SBCParameters()
+        self.params = params or SCBParameters()
         self.layout: StackLayout = compute_layout(pcba, self.params)
 
     # ------------------------------------------------------------------ #
@@ -100,7 +100,7 @@ class SBCDesigner:
 
     @staticmethod
     def export(parts: List[ModelPart], path: str) -> str:
-        return export_step(parts, path, name="SBC")
+        return export_step(parts, path, name="SCB")
 
     # ------------------------------------------------------------------ #
     def _sleeve_holes(self, z0: float, z1: float, interior_z0: Optional[float] = None):

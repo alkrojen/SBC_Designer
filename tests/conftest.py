@@ -8,10 +8,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from sbc_designer import demo_pcba  # noqa: E402
-from sbc_designer.demo_pcba import GREEN, NAVY, TERM_GREEN, _Builder  # noqa: E402
-from sbc_designer.pcba import analyze  # noqa: E402
-from sbc_designer.step_io import ModelPart, export_step, load_step  # noqa: E402
+from scb_designer import demo_pcba  # noqa: E402
+from scb_designer.demo_pcba import GREEN, NAVY, TERM_GREEN, _Builder  # noqa: E402
+from scb_designer.pcba import analyze  # noqa: E402
+from scb_designer.step_io import ModelPart, export_step, load_step  # noqa: E402
 
 DEMO_STEP = os.path.join(ROOT, "demo", "ac_controller_pcba.step")
 
@@ -63,8 +63,8 @@ def demo_pcba_model(demo_parts):
 
 @pytest.fixture(scope="session")
 def small_designer(small_pcba):
-    from sbc_designer.design import SBCDesigner
-    return SBCDesigner(small_pcba)
+    from scb_designer.design import SCBDesigner
+    return SCBDesigner(small_pcba)
 
 
 @pytest.fixture(scope="session")

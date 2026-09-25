@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from sbc_designer.geometry2d import (Rect, convex_hull, distance_to_polygon_edge, evenly_spaced,
+from scb_designer.geometry2d import (Rect, convex_hull, distance_to_polygon_edge, evenly_spaced,
                                      min_area_rect, minimum_spanning_tree, point_in_polygon,
                                      polygon_area, segment_rect)
 

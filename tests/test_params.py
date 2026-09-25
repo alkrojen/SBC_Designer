@@ -2,11 +2,11 @@ import dataclasses
 
 import pytest
 
-from sbc_designer.design.params import SBCParameters
+from scb_designer.design.params import SCBParameters
 
 
 def test_defaults_are_valid_and_follow_the_project_description():
-    p = SBCParameters()
+    p = SCBParameters()
     p.validate()
     assert 0.75 <= p.alignment_thickness <= 2.7
     assert p.screw_pitch == 30.0 and p.screw_diameter == 2.5
@@ -15,7 +15,7 @@ def test_defaults_are_valid_and_follow_the_project_description():
 
 
 def test_every_field_has_a_label_and_group():
-    for f in dataclasses.fields(SBCParameters):
+    for f in dataclasses.fields(SCBParameters):
         assert f.metadata.get("label")
         assert f.metadata.get("group")
 
@@ -30,19 +30,19 @@ def test_every_field_has_a_label_and_group():
 ])
 def test_invalid_values_rejected(changes):
     with pytest.raises(ValueError):
-        dataclasses.replace(SBCParameters(), **changes).validate()
+        dataclasses.replace(SCBParameters(), **changes).validate()
 
 
 def test_json_roundtrip(tmp_path):
-    p = dataclasses.replace(SBCParameters(), alignment_thickness=1.5, interior_screws="grid",
+    p = dataclasses.replace(SCBParameters(), alignment_thickness=1.5, interior_screws="grid",
                             power_keywords="TO-220")
     path = str(tmp_path / "p.json")
     p.save(path)
-    q = SBCParameters.load(path)
+    q = SCBParameters.load(path)
     assert q == p
     assert q.power_keyword_list == ("TO-220",)
 
 
 def test_from_dict_ignores_unknown_keys_and_coerces_types():
-    p = SBCParameters.from_dict({"alignment_thickness": "1.2", "bogus": 3})
+    p = SCBParameters.from_dict({"alignment_thickness": "1.2", "bogus": 3})
     assert p.alignment_thickness == 1.2

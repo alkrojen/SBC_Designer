@@ -8,7 +8,7 @@ sensor/stepper/display connectors, buzzer, regulator, passives).  The bottom
 side carries a handful of SMD parts plus the protruding leads of every
 through-hole part.
 
-Run ``python -m sbc_designer.demo_pcba [out.step]`` to regenerate the file
+Run ``python -m scb_designer.demo_pcba [out.step]`` to regenerate the file
 shipped in ``demo/``.
 """
 

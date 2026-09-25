@@ -7,7 +7,7 @@ on:
 
 jobs:
   windows:
-    name: Windows - unit tests and SBC_Designer.exe
+    name: Windows - unit tests and SCB_Designer.exe
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,17 +25,17 @@ jobs:
       - name: Unit tests
         run: python -m pytest -v
       - name: Build Windows application
-        run: python -m PyInstaller --noconfirm packaging/sbc_designer.spec
+        run: python -m PyInstaller --noconfirm packaging/scb_designer.spec
       - name: Smoke test the built exe (load demo, generate a part, exit)
         shell: pwsh
         run: |
-          if (-not (Test-Path dist/SBC_Designer/_internal/demo/ac_controller_pcba.step)) { throw "demo missing" }
-          $p = Start-Process -FilePath dist/SBC_Designer/SBC_Designer.exe -ArgumentList "--smoke-test" -Wait -PassThru
+          if (-not (Test-Path dist/SCB_Designer/_internal/demo/ac_controller_pcba.step)) { throw "demo missing" }
+          $p = Start-Process -FilePath dist/SCB_Designer/SCB_Designer.exe -ArgumentList "--smoke-test" -Wait -PassThru
           if ($p.ExitCode -ne 0) { throw "smoke test failed with exit code $($p.ExitCode)" }
       - uses: actions/upload-artifact@v4
         with:
-          name: SBC_Designer-windows
-          path: dist/SBC_Designer
+          name: SCB_Designer-windows
+          path: dist/SCB_Designer
 
   linux:
     name: Linux - unit tests (Xvfb)

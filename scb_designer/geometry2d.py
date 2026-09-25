@@ -1,4 +1,4 @@
-"""Small, dependency-free 2D geometry helpers used by the SBC layout code."""
+"""Small, dependency-free 2D geometry helpers used by the SCB layout code."""
 
 from __future__ import annotations
 
